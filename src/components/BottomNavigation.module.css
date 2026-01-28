@@ -1,0 +1,50 @@
+.navContainer {
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid #e4e4e7;
+  background-color: #ffffff;
+}
+
+.navItemsWrapper {
+  display: flex;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+}
+
+.icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.inactive {
+  color: #71717a;
+}
+
+.active {
+  color: #3e2a56;
+}
+
+.active .label {
+  font-weight: bold;
+}
+
+.spacer {
+  height: 1.25rem;
+  background-color: #ffffff;
+}
