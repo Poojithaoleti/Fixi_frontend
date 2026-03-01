@@ -2,9 +2,18 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useAuth } from '../context/AuthContext';
 
 export default function Welcome() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      // simply jump to home if already signed in
+      setTimeout(() => router.replace('/(tabs)'), 0);
+    }
+  }, [isAuthenticated, router]);
 
   const handleHouseholdPress = () => {
     router.push('/login');
@@ -21,7 +30,7 @@ export default function Welcome() {
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Welcome to Fixi</Text>
+            <Text style={styles.title}>Welcome to HomeFix</Text>
 
             {/* Subtitle */}
             <Text style={styles.subtitle}>
@@ -63,7 +72,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 32, // 2rem
+    paddingHorizontal: 32,
     paddingVertical: 32,
   },
   card: {
@@ -78,54 +87,71 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5eefe',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20, // 1.25rem
+    marginBottom: 20,
   },
   title: {
-    fontSize: 30, // 1.875rem
+    fontSize: 30,
     fontWeight: '800',
     color: '#3e2a56',
-    marginBottom: 12, // 0.75rem
+    marginBottom: 12,
     textAlign: 'center',
+    fontFamily: 'Manrope',
   },
   subtitle: {
-    fontSize: 16, // 1rem
+    fontSize: 16,
     color: '#6b7280',
     textAlign: 'center',
-    marginBottom: 20, // 1.25rem
+    marginBottom: 20,
     lineHeight: 24,
+    fontFamily: 'Manrope',
   },
   actions: {
-    marginTop: 16, // 1rem
+    marginTop: 16,
     width: '100%',
-    gap: 12, // 0.75rem
+    gap: 16,
   },
   primaryBtn: {
     backgroundColor: '#3e2a56',
-    paddingVertical: 12, // 0.75rem
-    paddingHorizontal: 16, // 1rem
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    height: 56,
+    width: '100%',
+    flexDirection: 'row',
+    shadowColor: '#3e2a56',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   primaryBtnText: {
     color: '#ffffff',
-    fontWeight: '600',
-    fontSize: 16,
+    fontWeight: '700',
+    fontSize: 18,
+    textAlign: 'center',
+    fontFamily: 'Manrope',
   },
   secondaryBtn: {
     backgroundColor: '#ffffff',
-    paddingVertical: 12, // 0.75rem
-    paddingHorizontal: 16, // 1rem
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderWidth: 2,
+    borderColor: '#3e2a56',
     justifyContent: 'center',
     alignItems: 'center',
+    height: 56,
+    width: '100%',
+    flexDirection: 'row',
   },
   secondaryBtnText: {
-    color: '#374151',
-    fontWeight: '600',
-    fontSize: 16,
+    color: '#3e2a56',
+    fontWeight: '700',
+    fontSize: 18,
+    textAlign: 'center',
+    fontFamily: 'Manrope',
   },
   disabledBtn: {
     opacity: 0.85,

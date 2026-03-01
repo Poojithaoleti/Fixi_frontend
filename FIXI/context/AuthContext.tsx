@@ -3,28 +3,50 @@ import React, { createContext, useContext, useState } from 'react';
 interface AuthContextType {
   isAuthenticated: boolean;
   user: any;
-  login: (user: any) => void;
-  logout: () => void;
+  token: string | null;
+  loading: boolean;
+  error: string | null;
+  login: (user: any, token: string) => Promise<void>;
+  logout: () => Promise<void>;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const login = (userData: any) => {
+  // derive authentication from token
+  const isAuthenticated = !!token;
+
+  const login = async (userData: any, authToken: string) => {
     setUser(userData);
-    setIsAuthenticated(true);
+    setToken(authToken);
   };
 
-  const logout = () => {
+  const logout = async () => {
     setUser(null);
-    setIsAuthenticated(false);
+    setToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        user,
+        token,
+        loading,
+        error,
+        login,
+        logout,
+        setLoading,
+        setError,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

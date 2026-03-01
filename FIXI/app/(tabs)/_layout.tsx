@@ -1,30 +1,30 @@
 import React from 'react';
-import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
-type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
-import { AuthProvider } from '../../context/AuthContext';
-import { Tabs } from 'expo-router';
+import { useAuth } from '../../context/AuthContext';
+import { Tabs, useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
 import Header from '../../components/ui/Header';
 
+type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
+
 export default function TabsLayout() {
-  return (
-    <AuthProvider>
-      <TabRoutes />
-    </AuthProvider>
-  );
+  return <TabRoutes />;
 }
 
 function TabRoutes() {
   const navigation = useNavigation<any>();
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
+
   const [historyLen, setHistoryLen] = React.useState(0);
   const [activeTab, setActiveTab] = React.useState('index');
   const historyRef = React.useRef<string[]>([]);
-  const allowedTabs = React.useMemo(() => new Set(['index', 'services', 'bookings', 'profile']), []);
+
+  const allowedTabs = React.useMemo(
+    () => new Set(['index', 'services', 'bookings', 'profile']),
+    []
+  );
 
   const tabTitles: { [key: string]: string } = {
     index: 'Home',
@@ -39,66 +39,65 @@ function TabRoutes() {
   };
 
   const pushHistory = (routeName: string) => {
-    if (!allowedTabs.has(routeName)) {
-      return;
-    }
+    if (!allowedTabs.has(routeName)) return;
+
     setActiveTab(routeName);
     const path = tabPath(routeName);
     const h = historyRef.current;
+
     if (h.length === 0 || h[h.length - 1] !== path) {
       h.push(path);
       setHistoryLen(h.length);
     }
   };
 
+  // record initial tab once
   React.useEffect(() => {
-    // record initial active tab so back has something to go to
-    // default to index on mount to ensure a valid starting entry
     if (historyRef.current.length === 0) {
       pushHistory('index');
     }
-    // run only once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 🔒 protect tabs (removed setTimeout)
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/welcome');
+    }
+  }, [isAuthenticated]);
 
   const goBack = () => {
     const h = historyRef.current;
+
     if (h.length > 1) {
-      // remove current
       h.pop();
       const prev = h[h.length - 1];
       setHistoryLen(h.length);
+
       if (prev) {
         try {
-          // use expo-router to navigate by path
           router.push(prev as any);
           return;
-        } catch (e) {
-          // fallback to react-navigation if available
-        }
-        if ((navigation as any).jumpTo) {
-          try {
-            (navigation as any).jumpTo(prev);
-            return;
-          } catch (e) {
-            // ignore
-          }
-        }
+        } catch {}
         navigation.navigate(prev as never);
       }
     }
+
+    router.back();
   };
 
   const listenersFor = (routeName: string) => ({
     focus: () => pushHistory(routeName),
-    tabPress: () => {
-      pushHistory(routeName);
-    },
+    tabPress: () => pushHistory(routeName),
   });
 
   return (
     <>
-      <Header title={tabTitles[activeTab] || 'Home'} onBackClick={goBack} showBack={true} />
+      <Header
+        title={tabTitles[activeTab] || 'Home'}
+        onBackClick={goBack}
+        showBack={true}
+      />
+
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: '#3e2a56',
@@ -113,31 +112,42 @@ function TabRoutes() {
           name="index"
           options={{
             title: 'Home',
-            tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+            tabBarIcon: ({ color }) => (
+              <TabBarIcon name="home" color={color} />
+            ),
           }}
           listeners={listenersFor('index')}
         />
+
         <Tabs.Screen
           name="services"
           options={{
             title: 'Services',
-            tabBarIcon: ({ color }) => <TabBarIcon name="list-alt" color={color} />,
+            tabBarIcon: ({ color }) => (
+              <TabBarIcon name="list-alt" color={color} />
+            ),
           }}
           listeners={listenersFor('services')}
         />
+
         <Tabs.Screen
           name="bookings"
           options={{
             title: 'Bookings',
-            tabBarIcon: ({ color }) => <TabBarIcon name="calendar-month" color={color} />,
+            tabBarIcon: ({ color }) => (
+              <TabBarIcon name="calendar-month" color={color} />
+            ),
           }}
           listeners={listenersFor('bookings')}
         />
+
         <Tabs.Screen
           name="profile"
           options={{
             title: 'Profile',
-            tabBarIcon: ({ color }) => <TabBarIcon name="person" color={color} />,
+            tabBarIcon: ({ color }) => (
+              <TabBarIcon name="person" color={color} />
+            ),
           }}
           listeners={listenersFor('profile')}
         />
