@@ -10,8 +10,9 @@ export default function Welcome() {
 
   React.useEffect(() => {
     if (isAuthenticated) {
-      // simply jump to home if already signed in
-      setTimeout(() => router.replace('/(tabs)'), 0);
+      // simply jump to home if already signed in; `/home` is the actual
+      // path for the first tab, so we avoid using the grouping segment.
+      setTimeout(() => router.replace('/home'), 0);
     }
   }, [isAuthenticated, router]);
 
