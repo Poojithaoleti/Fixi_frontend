@@ -7,7 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -22,6 +22,8 @@ interface Service {
 }
 
 export default function CategoryServices() {
+
+  const router = useRouter();
   const { id, name } = useLocalSearchParams();
 
   const [services, setServices] = useState<Service[]>([]);
@@ -29,6 +31,14 @@ export default function CategoryServices() {
   useEffect(() => {
     loadServices();
   }, []);
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)/home");
+    }
+  };
 
   const loadServices = async () => {
     try {
@@ -38,8 +48,6 @@ export default function CategoryServices() {
       // Example API:
       // GET /services?categoryId=1
       //
-      // Example implementation later:
-      //
       // const res = await fetch(
       //   `https://your-backend.com/services?categoryId=${id}`
       // );
@@ -47,8 +55,6 @@ export default function CategoryServices() {
       // setServices(data);
       // -------------------------------------------
 
-
-      // SAMPLE DATA ONLY FOR CLEANING CATEGORY
       if (id === "1") {
         setServices([
           {
@@ -83,7 +89,6 @@ export default function CategoryServices() {
           },
         ]);
       } else {
-        // No services yet
         setServices([]);
       }
 
@@ -92,11 +97,15 @@ export default function CategoryServices() {
     }
   };
 
-
-  // 🚧 SHOW COMING SOON IF NO SERVICES
   if (services.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={handleBack}>
+            <MaterialIcons name="arrow-back" size={24} />
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.center}>
           <Text style={styles.header}>{name}</Text>
           <Text style={styles.comingSoon}>
@@ -106,7 +115,6 @@ export default function CategoryServices() {
       </SafeAreaView>
     );
   }
-
 
   const renderService = ({ item }: { item: Service }) => (
     <View style={styles.card}>
@@ -135,10 +143,16 @@ export default function CategoryServices() {
     </View>
   );
 
-
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>{name} Services</Text>
+
+      <View style={styles.headerRow}>
+        <TouchableOpacity onPress={handleBack}>
+          <MaterialIcons name="arrow-back" size={24} />
+        </TouchableOpacity>
+
+        <Text style={styles.header}>{name} Services</Text>
+      </View>
 
       <FlatList
         data={services}
@@ -150,17 +164,23 @@ export default function CategoryServices() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f6f7f8",
   },
 
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+
   header: {
     fontSize: 22,
     fontWeight: "700",
-    padding: 16,
+    marginLeft: 10,
   },
 
   center: {

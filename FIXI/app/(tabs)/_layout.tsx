@@ -12,10 +12,10 @@ export default function TabsLayout() {
   const segments = useSegments();
   const { isAuthenticated, loading } = useAuth();
 
-  const activeTab = segments[1] ?? "index";
+  const activeTab = segments[1] ?? "home";
 
   const tabTitles: Record<string, string> = {
-    index: "Home",
+    home: "Home",
     services: "Services",
     bookings: "Bookings",
     profile: "Profile",
