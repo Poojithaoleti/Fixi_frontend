@@ -70,11 +70,12 @@ export default function HomeScreen() {
   };
 
   const handleServicePress = (service: Service) => {
-
-    // TODO: Navigate to service details page later
-    // Example: router.push(`/service/${service.id}`)
-
-    Alert.alert("Service", `Selected: ${service.name}`);
+    // Navigate to service details page
+    // Service can be from any category or popular services
+    router.push({
+      pathname: "/services/[id]",
+      params: { id: service.id },
+    } as any);
   };
 
   return (

@@ -40,6 +40,15 @@ export default function CategoryServices() {
     }
   };
 
+  const handleServicePress = (service: Service) => {
+    // Navigate to service details page
+    // Users can click any service from any category
+    router.push({
+      pathname: "/services/[id]",
+      params: { id: service.id },
+    } as any);
+  };
+
   const loadServices = async () => {
     try {
 
@@ -135,7 +144,11 @@ export default function CategoryServices() {
         <View style={styles.row}>
           <Text style={styles.price}>₹{item.price}</Text>
 
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity 
+            style={styles.button}
+            onPress={() => handleServicePress(item)}
+            activeOpacity={0.7}
+          >
             <Text style={styles.buttonText}>View Details</Text>
           </TouchableOpacity>
         </View>

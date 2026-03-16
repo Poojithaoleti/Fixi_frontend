@@ -36,11 +36,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storedUser = await AsyncStorage.getItem("authUser");
 
         if (storedToken && storedUser) {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          try {
+            // TODO: BACKEND INTEGRATION
+            // Validate token with backend API:
+            // GET /auth/validate
+            // Authorization: Bearer <token>
+            
+            const parsedUser = JSON.parse(storedUser);
+            setToken(storedToken);
+            setUser(parsedUser);
+          } catch (parseErr) {
+            // Corrupted data, clear storage
+            console.warn("Failed to parse stored user data:", parseErr);
+            await AsyncStorage.removeItem("authToken");
+            await AsyncStorage.removeItem("authUser");
+            setError("Session data corrupted, please login again");
+          }
         }
       } catch (err) {
-        console.log("Auth load error:", err);
+        console.error("Auth load error:", err);
+        setError("Failed to restore session");
+        // Clear storage on critical errors
+        try {
+          await AsyncStorage.removeItem("authToken");
+          await AsyncStorage.removeItem("authUser");
+        } catch (clearErr) {
+          console.error("Failed to clear storage:", clearErr);
+        }
       } finally {
         setLoading(false);
       }
@@ -52,6 +74,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (userData: User, authToken: string) => {
     try {
       setLoading(true);
+      
+      // TODO: BACKEND INTEGRATION
+      // POST /auth/login
+      // Body: { email, password }
+      // Returns: { token, user }
 
       await AsyncStorage.setItem("authToken", authToken);
       await AsyncStorage.setItem("authUser", JSON.stringify(userData));
@@ -60,7 +87,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(authToken);
       setError(null);
     } catch (err) {
-      setError("Login failed");
+      console.error("Login storage error:", err);
+      setError("Failed to save session");
+      // Clear any partial data
+      try {
+        await AsyncStorage.removeItem("authToken");
+        await AsyncStorage.removeItem("authUser");
+      } catch (clearErr) {
+        console.error("Failed to clear on login error:", clearErr);
+      }
     } finally {
       setLoading(false);
     }
@@ -69,14 +104,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       setLoading(true);
+      
+      // TODO: BACKEND INTEGRATION
+      // POST /auth/logout
+      // Authorization: Bearer <token>
 
       await AsyncStorage.removeItem("authToken");
       await AsyncStorage.removeItem("authUser");
 
       setUser(null);
       setToken(null);
+      setError(null);
     } catch (err) {
-      console.log("Logout error:", err);
+      console.error("Logout error:", err);
+      setError("Failed to logout properly");
+      // Force clear anyway
+      setUser(null);
+      setToken(null);
     } finally {
       setLoading(false);
     }
@@ -104,7 +148,17 @@ export function useAuth() {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
+    // Return a default safe context instead of throwing
+    return {
+      isAuthenticated: false,
+      user: null,
+      token: null,
+      loading: true,
+      error: null,
+      login: async () => {},
+      logout: async () => {},
+      setError: () => {},
+    };
   }
 
   return context;

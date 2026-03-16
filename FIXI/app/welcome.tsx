@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -6,15 +6,17 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Welcome() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+  const redirectInProgress = useRef(false);
 
-  React.useEffect(() => {
-    if (isAuthenticated) {
-      // simply jump to home if already signed in; `/home` is the actual
-      // path for the first tab, so we avoid using the grouping segment.
-      setTimeout(() => router.replace('/home'), 0);
+  // Only redirect when auth state is confirmed AND not loading
+  useEffect(() => {
+    if (!loading && isAuthenticated && !redirectInProgress.current) {
+      redirectInProgress.current = true;
+      // Use replace to avoid history issues, and correct path with tabs grouping
+      router.replace('/(tabs)/home');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, loading]);
 
   const handleHouseholdPress = () => {
     router.push('/login');

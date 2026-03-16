@@ -1,16 +1,14 @@
-import React, { useEffect } from "react";
-import { Tabs, useRouter, useSegments } from "expo-router";
-import { StyleSheet, View, ActivityIndicator } from "react-native";
+import React from "react";
+import { Tabs } from "expo-router";
+import { StyleSheet } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useAuth } from "@/context/AuthContext";
 import Header from "@/components/ui/Header";
+import { useSegments } from "expo-router";
 
 type IconName = React.ComponentProps<typeof MaterialIcons>["name"];
 
 export default function TabsLayout() {
-  const router = useRouter();
   const segments = useSegments();
-  const { isAuthenticated, loading } = useAuth();
 
   const activeTab = segments[1] ?? "home";
 
@@ -20,21 +18,6 @@ export default function TabsLayout() {
     bookings: "Bookings",
     profile: "Profile",
   };
-
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.replace("/welcome");
-    }
-  }, [loading, isAuthenticated]);
-
-  // Show loader while auth state is being checked
-  if (loading) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#3e2a56" />
-      </View>
-    );
-  }
 
   return (
     <>
@@ -110,10 +93,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     marginTop: 2,
-  },
-  loader: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
 });
