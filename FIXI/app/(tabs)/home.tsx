@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router"; // ✅ Router added
+import { useRouter } from "expo-router";
 
 import Categories from "../../components/home/Categories";
 import Offers from "../../components/home/Offers";
@@ -26,13 +27,13 @@ import {
 } from "../../lib/api";
 
 export default function HomeScreen() {
-  const router = useRouter(); // ✅ Initialize router
+  const router = useRouter();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [popularServices, setPopularServices] = useState<Service[]>([]);
-
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadData();
@@ -40,10 +41,19 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
+      setLoading(true);
+
+      //  Backend Integration Point:
+      // Replace these mock/service functions with real API calls
+      // Example:
+      // const cats = await api.get("/categories");
+      // const offs = await api.get("/offers");
+      // const servs = await api.get("/services/popular");
+
       const [cats, offs, servs] = await Promise.all([
-        fetchCategories(),
-        fetchOffers(),
-        fetchPopularServices(),
+        fetchCategories(),       // TODO: Replace with GET /categories
+        fetchOffers(),           // TODO: Replace with GET /offers
+        fetchPopularServices(),  // TODO: Replace with GET /services/popular
       ]);
 
       setCategories(cats);
@@ -51,36 +61,59 @@ export default function HomeScreen() {
       setPopularServices(servs);
     } catch (error) {
       console.error("Failed to load data:", error);
+
+      //  Backend Error Handling:
+      // Later replace with proper error handling from API response
+      // Example: error.response?.data?.message
+
       Alert.alert("Error", "Failed to load data");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCategoryPress = (category: Category) => {
-    // push using the object form; this builds a proper nested state
-    // which often avoids hydration errors when going back.
-    router.push(
-      {
-        pathname: "/categories/[id]",
-        params: { id: category.id, name: category.name },
-      } as any
-    );
+    //  Backend Note:
+    // category.id must match backend ID format
+
+    router.push({
+      pathname: "/categories/[id]",
+      params: {
+        id: category.id,
+        name: category.name, // optional, for UI display
+      },
+    });
   };
+
   const handleClaimOffer = (offer: Offer) => {
+    //  Backend Integration Point:
+    // Replace with API call:
+    // await api.post(`/offers/${offer.id}/claim`);
+
     Alert.alert("Offer", `Claimed: ${offer.title}`);
   };
 
   const handleServicePress = (service: Service) => {
-    // Navigate to service details page
-    // Service can be from any category or popular services
+    //  Backend Note:
+    // service.id should match backend service identifier
+
     router.push({
       pathname: "/services/[id]",
       params: { id: service.id },
-    } as any);
+    });
   };
+
+  //  Loading State (important for API calls)
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loader}>
+        <ActivityIndicator size="large" color="#3e2a56" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
@@ -111,7 +144,6 @@ export default function HomeScreen() {
             <TextInput
               style={styles.searchInput}
               placeholder="Search for services"
-              placeholderTextColor="#9ca3af"
               value={search}
               onChangeText={setSearch}
             />
@@ -125,41 +157,48 @@ export default function HomeScreen() {
 
       {/* Main Content */}
       <FlatList
-        data={offers}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Offers offers={[item]} onClaimPress={handleClaimOffer} />
-        )}
-        ListHeaderComponent={
-          <Categories
-            categories={categories}
-            onCategoryPress={handleCategoryPress}
-          />
-        }
-        ListFooterComponent={
-          <PopularServices
-            services={popularServices}
-            onServicePress={handleServicePress}
-          />
-        }
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
-      />
+        data={[{ key: "content" }]}
+        renderItem={() => (
+          <>
+            {/*  Data comes from backend */}
+            <Categories
+              categories={categories}
+              onCategoryPress={handleCategoryPress}
+            />
 
+            {/*  Offers list from backend */}
+            <Offers
+              offers={offers}
+              onClaimPress={handleClaimOffer}
+            />
+
+            {/*  Popular services from backend */}
+            <PopularServices
+              services={popularServices}
+              onServicePress={handleServicePress}
+            />
+          </>
+        )}
+        keyExtractor={(item) => item.key}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: { flex: 1, backgroundColor: "#fff" },
+
+  loader: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   header: {
     padding: 16,
-    paddingTop: 8,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
   },
 
   headerTop: {
@@ -187,7 +226,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#141316",
   },
 
   notificationButton: {
@@ -220,8 +258,6 @@ const styles = StyleSheet.create({
 
   searchInput: {
     flex: 1,
-    fontSize: 14,
-    color: "#141316",
   },
 
   filterButton: {
@@ -231,5 +267,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
+  },
+
+  content: {
+    paddingBottom: 120,
   },
 });

@@ -3,14 +3,23 @@ import { Tabs } from "expo-router";
 import { StyleSheet } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Header from "@/components/ui/Header";
-import { useSegments } from "expo-router";
-
+import { usePathname } from "expo-router";
 type IconName = React.ComponentProps<typeof MaterialIcons>["name"];
 
 export default function TabsLayout() {
-  const segments = useSegments();
-
-  const activeTab = segments[1] ?? "home";
+ 
+const pathname = usePathname();
+  
+const activeTab =
+  pathname.startsWith("/home")
+    ? "home"
+    : pathname.startsWith("/services")
+    ? "services"
+    : pathname.startsWith("/bookings")
+    ? "bookings"
+    : pathname.startsWith("/profile")
+    ? "profile"
+    : "home";
 
   const tabTitles: Record<string, string> = {
     home: "Home",
@@ -18,10 +27,12 @@ export default function TabsLayout() {
     bookings: "Bookings",
     profile: "Profile",
   };
-
+ 
+const showBack =
+  pathname.includes("/categories") || pathname.includes("/services/");
   return (
     <>
-      <Header title={tabTitles[activeTab] || "Home"} showBack={false} />
+      <Header title={tabTitles[activeTab] || "Home"} showBack={showBack} />
 
       <Tabs
         screenOptions={{
@@ -72,6 +83,8 @@ export default function TabsLayout() {
             ),
           }}
         />
+        <Tabs.Screen name="categories/[id]" options={{ href: null }} />
+  <Tabs.Screen name="services/[id]" options={{ href: null }} />
       </Tabs>
     </>
   );
