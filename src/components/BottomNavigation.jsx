@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './BottomNavigation.module.css';
 
-export default function BottomNavigation({ activeNav = 'bookings' }) {
+export default function BottomNavigation({ activeNav = 'home', onNavigate }) {
   const navItems = [
     { id: 'home', label: 'Home', icon: 'home' },
     { id: 'services', label: 'Services', icon: 'list_alt' },
@@ -10,24 +10,22 @@ export default function BottomNavigation({ activeNav = 'bookings' }) {
   ];
 
   return (
-    <div className={styles.navContainer}>
-      <div className={styles.navItemsWrapper}>
+    <nav className={styles.navContainer}>
+      <div className={styles.navInner}>
         {navItems.map((item) => (
-          <a
+          <button
             key={item.id}
-            href="#"
-            className={`${styles.navItem} ${
-              activeNav === item.id ? styles.active : styles.inactive
-            }`}
+            className={`${styles.navItem} ${activeNav === item.id ? styles.active : styles.inactive}`}
+            onClick={() => onNavigate?.(item.id)}
+            aria-label={item.label}
           >
             <span className={`${styles.icon} material-symbols-outlined`}>
               {item.icon}
             </span>
-            <p className={styles.label}>{item.label}</p>
-          </a>
+            <span className={styles.label}>{item.label}</span>
+          </button>
         ))}
       </div>
-      <div className={styles.spacer}></div>
-    </div>
+    </nav>
   );
 }

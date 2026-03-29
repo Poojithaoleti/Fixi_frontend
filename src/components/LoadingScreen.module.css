@@ -1,0 +1,228 @@
+/* ============================================================
+   LoadingScreen — Magnifying lens + category icon
+   ============================================================ */
+
+/* Full screen overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 6, 20, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayIn 0.25s ease forwards;
+}
+
+.overlay.exiting {
+  animation: overlayOut 0.3s ease forwards;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes overlayOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Floating card */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 40px 48px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 32px;
+  animation: cardIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.overlay.exiting .card {
+  animation: cardOut 0.3s ease forwards;
+}
+
+@keyframes cardIn {
+  from { transform: scale(0.8) translateY(20px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+@keyframes cardOut {
+  from { transform: scale(1) translateY(0); opacity: 1; }
+  to   { transform: scale(1.05) translateY(-10px); opacity: 0; }
+}
+
+/* ── Lens ─────────────────────────── */
+.lensWrapper {
+  position: relative;
+  width: 120px;
+  height: 140px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  animation: lensFloat 3s ease-in-out infinite;
+}
+
+@keyframes lensFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+.lens {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  animation: lensPulse 2s ease-in-out infinite;
+}
+
+@keyframes lensPulse {
+  0%, 100% { box-shadow: 0 0 0   0  rgba(255,255,255,0.1), 0 12px 40px rgba(0,0,0,0.3); }
+  50%       { box-shadow: 0 0 30px 8px rgba(255,255,255,0.15), 0 12px 40px rgba(0,0,0,0.4); }
+}
+
+.lensInner {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  border: 2.5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: innerSpin 6s linear infinite;
+}
+
+@keyframes innerSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.categoryIcon {
+  font-size: 34px;
+  animation: iconCounterSpin 6s linear infinite;
+}
+
+/* Counter-rotate the icon so it stays upright while ring spins */
+@keyframes iconCounterSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+/* Lens handle */
+.handle {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  width: 10px;
+  height: 38px;
+  border-radius: 6px;
+  transform: rotate(45deg);
+  z-index: 2;
+  opacity: 0.9;
+}
+
+/* Orbit ring */
+.orbitRing {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid;
+  animation: orbitSpin 4s linear infinite;
+  z-index: 1;
+}
+
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.orbitDot {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Glow behind the lens */
+.glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1);   }
+  50%       { opacity: 1.0; transform: translate(-50%, -50%) scale(1.15); }
+}
+
+/* ── Text Block ──────────────────────── */
+.textBlock {
+  text-align: center;
+}
+
+.mainText {
+  font-family: 'Manrope', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+
+.subText {
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+.dots {
+  display: inline-block;
+  width: 24px;
+  text-align: left;
+}
+
+/* ── Progress Bar ────────────────────── */
+.progressTrack {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: 100px;
+  animation: progressSweep 1.4s ease-in-out infinite;
+  width: 40%;
+}
+
+@keyframes progressSweep {
+  0%   { transform: translateX(-250%); }
+  100% { transform: translateX(600%);  }
+}

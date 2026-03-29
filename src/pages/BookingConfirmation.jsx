@@ -1,25 +1,25 @@
 import React from 'react';
 import Header from '../components/Header';
 import BookingCard from '../components/BookingCard';
-import BottomNavigation from '../components/BottomNavigation';
 import styles from './BookingConfirmation.module.css';
 
-export default function BookingConfirmation() {
+export default function BookingConfirmation({ onNavigate }) {
   const handleBackClick = () => {
-    console.log('Back button clicked');
+    onNavigate('services');
   };
 
   const handleViewDetails = () => {
-    console.log('View Booking Details clicked');
+    // Navigate to the bookings list (future page — for now go to home)
+    onNavigate('home');
   };
 
   const handleExploreServices = () => {
-    console.log('Explore Other Services clicked');
+    onNavigate('services');
   };
 
   const bookingData = {
     serviceName: 'Expert Electrician',
-    serviceImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJPY553xctADWXokwMt2-A68ckNlBLInbgyJznlVsIfAP8jdaO8Zn_mfss1qMR0NWfKgOvaaGJla2N6ZRn9ylxPdzbQGTbb-VkJXp0WQ4pXNnalG1n_1qQuwmeOYMyjjTFqJJg2pTt6g5kh-RiEyd8MHeoWZM54I-TmGIQrX-BiWd_b-VHgaYueC2uHHbEiydgyUHeCSpEriA54W_p7eVtzc_YoJ9zG0AQR_j5-BqUOY69u0lYnqjO8CTOjTOdmYC4dJMsVgLZD4-j',
+    serviceImage: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=200&q=80',
     date: 'Monday, 28th October 2024',
     time: '10:00 AM - 11:00 AM',
     location: '123 Maple Street, Anytown',
@@ -29,13 +29,12 @@ export default function BookingConfirmation() {
     <div className={styles.pageContainer}>
       <div className={styles.content}>
         <Header title="Booking Confirmation" onBackClick={handleBackClick} />
-        <BookingCard 
+        <BookingCard
           booking={bookingData}
           onViewDetails={handleViewDetails}
           onExploreServices={handleExploreServices}
         />
       </div>
-      <BottomNavigation activeNav="bookings" />
     </div>
   );
 }

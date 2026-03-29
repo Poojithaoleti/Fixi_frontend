@@ -1,0 +1,144 @@
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background-color: #3e2a56;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 500;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 32px 40px;
+}
+
+.logoIcon {
+  width: 42px;
+  height: 42px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3e2a56;
+}
+
+.logoText {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  position: relative;
+  width: 100%;
+  text-align: left;
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.navItem.active {
+  background: white;
+  color: #3e2a56;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.activeIndicator {
+  position: absolute;
+  right: 16px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3e2a56;
+}
+
+.sidebarFooter {
+  padding: 32px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.userBrief {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: white;
+  color: #3e2a56;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.userRole {
+  font-size: 12px;
+  opacity: 0.6;
+  margin: 0;
+}
+
+.logoutBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+}
+
+.logoutBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

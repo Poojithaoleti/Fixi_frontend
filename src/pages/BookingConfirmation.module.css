@@ -1,12 +1,13 @@
 .pageContainer {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background-color: #ffffff;
-  font-family: Manrope, "Noto Sans", sans-serif;
+  background-color: #f8f9fa;
+  font-family: 'Manrope', sans-serif;
+  padding-bottom: 90px; /* Space for fixed bottom nav */
 }
 
 .content {
   flex: 1;
-  padding: 1rem;
+  width: 100%;
 }
