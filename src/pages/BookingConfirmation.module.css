@@ -1,0 +1,13 @@
+.pageContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  font-family: 'Manrope', sans-serif;
+  padding-bottom: 90px; /* Space for fixed bottom nav */
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+}
