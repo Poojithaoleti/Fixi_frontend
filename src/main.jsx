@@ -99,9 +99,37 @@ function App() {
 
   const handleContentReady = () => setIsContentReady(true);
 
+  // Track if we've shown the forced demo loader for Electrical this session
+  const [electricalForceLoaded, setElectricalForceLoaded] = useState(
+    () => !!sessionStorage.getItem('electrical_demo_done')
+  );
+
   // Main navigation logic
   const navigateTo = (page, context = null) => {
-    // 1. Handle actual page transition immediately
+    // 0. SPECIAL CASE: Electrical Prototype Demo (Force Loader Once)
+    const isFirstElectrical = page === 'subservices' && context === 'Electrical' && !electricalForceLoaded;
+
+    if (isFirstElectrical) {
+      setElectricalForceLoaded(true);
+      sessionStorage.setItem('electrical_demo_done', 'true');
+      
+      // Setup the loader immediately
+      setLoadingCtx({ page, category: 'Electrical', service: null, isExiting: false });
+      setStartTime(Date.now());
+      setIsContentReady(false);
+      setPendingNav({ page, context });
+
+      // Artificial delay before showing the content
+      setTimeout(() => {
+        setIsContentReady(true);
+      }, 2000);
+
+      // Do NOT switch page yet — wait for the effect to handle it or switch now?
+      // Actually, many users prefer seeing the "loading" state on top of the OLD page.
+      return; 
+    }
+
+    // 1. Handle normal page transition immediately
     if (page === 'subservices' && context) setSelectedCategory(context);
     if (page === 'service-details' && context) {
       setSelectedService({ ...context, _category: selectedCategory });
@@ -109,7 +137,7 @@ function App() {
     setCurrentPage(page);
     window.scrollTo(0, 0);
 
-    // 2. Handle "Issue Detection" (Loading Screen)
+    // 2. Handle "Issue Detection" (Loading Screen for others)
     if (LOADING_PAGES.has(page)) {
       setPendingNav({ page, context });
       setIsContentReady(false);
@@ -123,22 +151,33 @@ function App() {
   // Grace period / Issue detection effect
   useEffect(() => {
     if (!pendingNav || isContentReady) {
-      // If we're done or nothing is pending, cleanup
-      if (isContentReady && loadingCtx) {
-        // Only if the loader was actually shown, fade it out
-        const elapsed = Date.now() - startTime;
-        const remaining = Math.max(0, MIN_DISPLAY_TIME - elapsed);
-        
-        const cleanupTimer = setTimeout(() => {
-          setLoadingCtx(prev => (prev ? { ...prev, isExiting: true } : null));
-          setTimeout(() => {
-            setLoadingCtx(null);
-            setPendingNav(null);
-          }, 300);
-        }, remaining);
-        return () => clearTimeout(cleanupTimer);
-      } else if (isContentReady) {
-        setPendingNav(null);
+      // Transition complete or nothing pending
+      if (isContentReady && pendingNav) {
+        // Finalize the transition if it was delayed (like in our Electrical demo)
+        const { page, context } = pendingNav;
+        if (page === 'subservices' && context) setSelectedCategory(context);
+        if (page === 'service-details' && context) {
+          setSelectedService({ ...context, _category: selectedCategory });
+        }
+        setCurrentPage(page);
+        window.scrollTo(0, 0);
+
+        // Cleanup loader
+        if (loadingCtx) {
+          const elapsed = Date.now() - startTime;
+          const remaining = Math.max(0, MIN_DISPLAY_TIME - elapsed);
+          
+          const cleanupTimer = setTimeout(() => {
+            setLoadingCtx(prev => (prev ? { ...prev, isExiting: true } : null));
+            setTimeout(() => {
+              setLoadingCtx(null);
+              setPendingNav(null);
+            }, 300);
+          }, remaining);
+          return () => clearTimeout(cleanupTimer);
+        } else {
+          setPendingNav(null);
+        }
       }
       return;
     }
