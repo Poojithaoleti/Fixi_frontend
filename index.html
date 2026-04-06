@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <title>Homezy</title>
+  </head>
+  <style>
+    #splash-screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #3e2a56;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      color: white;
+      font-family: 'Manrope', sans-serif;
+    }
+    .splash-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      animation: splashPulse 2s ease-in-out infinite;
+    }
+    .splash-icon {
+      font-size: 48px !important;
+      background: rgba(255,255,255,0.1);
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .splash-text {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .initializing {
+      font-size: 14px;
+      opacity: 0.6;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    @keyframes splashPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+  </style>
+  <body>
+    <div id="root">
+      <div id="splash-screen">
+        <div class="splash-logo">
+          <span class="material-symbols-outlined splash-icon">auto_fix</span>
+          <span class="splash-text">Homezy</span>
+        </div>
+        <div class="initializing">Initializing services...</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
