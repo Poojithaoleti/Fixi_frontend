@@ -29,7 +29,7 @@ const activeTab =
   };
  
 const showBack =
-  pathname.includes("/categories") || pathname.includes("/services/");
+  pathname.includes("/categories/") || pathname.includes("/services/");
   return (
     <>
       <Header title={tabTitles[activeTab] || "Home"} showBack={showBack} />
@@ -85,6 +85,7 @@ const showBack =
         />
         <Tabs.Screen name="categories/[id]" options={{ href: null }} />
   <Tabs.Screen name="services/[id]" options={{ href: null }} />
+  <Tabs.Screen name="profile/edit" options={{ href: null }} />
       </Tabs>
     </>
   );
