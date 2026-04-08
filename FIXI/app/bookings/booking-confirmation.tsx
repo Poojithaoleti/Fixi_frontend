@@ -1,12 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 // simple placeholder screen so Expo Router has a default export
 export default function BookingConfirmation() {
 	return (
-		<View style={styles.container}>
-			<Text style={styles.text}>Booking Confirmed!</Text>
-		</View>
+		<ProtectedRoute requireProfileComplete>
+			<View style={styles.container}>
+				<Text style={styles.text}>Booking Confirmed!</Text>
+			</View>
+		</ProtectedRoute>
 	);
 }
 

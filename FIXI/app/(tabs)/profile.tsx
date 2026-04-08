@@ -53,7 +53,7 @@ export default function ProfileScreen() {
       <View style={styles.header}>
         <Image
           source={{
-            uri: user?.avatar || "https://via.placeholder.com/150",
+            uri: user?.profilePic || "https://via.placeholder.com/150",
           }}
           style={styles.avatar}
         />

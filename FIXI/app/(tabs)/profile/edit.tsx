@@ -22,7 +22,7 @@ export default function EditProfile() {
   const [phone, setPhone] = useState(user?.phone || "");
   const [email, setEmail] = useState(user?.email || "");
   const [address, setAddress] = useState(user?.address || "");
-  const [avatar, setAvatar] = useState(user?.avatar || "");
+  const [profilePic, setProfilePic] = useState(user?.profilePic || "");
   const [imageFile, setImageFile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +34,7 @@ export default function EditProfile() {
 
     if (!res.canceled) {
       const img = res.assets[0];
-      setAvatar(img.uri);
+      setProfilePic(img.uri);
       setImageFile(img);
     }
   };
@@ -53,7 +53,7 @@ export default function EditProfile() {
           phone,
           email,
           address,
-          avatar: imageFile ? imageFile.uri : avatar,
+          profilePic: imageFile ? imageFile.uri : profilePic,
         },
       };
 
@@ -72,7 +72,7 @@ export default function EditProfile() {
     <ScrollView style={styles.container}>
       {/* Avatar */}
       <TouchableOpacity onPress={pickImage} style={styles.center}>
-        <Image source={{ uri: avatar }} style={styles.avatar} />
+        <Image source={{ uri: profilePic }} style={styles.avatar} />
         <Text style={{ color: "#197fe6" }}>Change Photo</Text>
       </TouchableOpacity>
 

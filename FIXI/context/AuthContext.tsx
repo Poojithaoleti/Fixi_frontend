@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { loginWithGoogleToken } from "@/services/authService";
+import api from "@/lib/axiosConfig";
 
 const STORAGE_KEYS = {
   TOKEN: "authToken",
+  REFRESH_TOKEN: "refreshToken",
   USER: "authUser",
 };
 
@@ -12,8 +15,21 @@ interface User {
   email: string;
   phone?: string;
   address?: string;
-  avatar?: string;
+  address_text?: string;
+  location?: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+  services?: string[];
+  experienceYears?: number;
+  pricePerHour?: number;
+  rating?: number;
+  profilePic?: string;
+  role?: "customer" | "technician";
+  isProfileComplete: boolean;
 }
+
+type AuthRole = "customer" | "technician";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -22,7 +38,8 @@ interface AuthContextType {
   loading: boolean;
   authLoading: boolean;
   error: string | null;
-  login: (user: User, token: string) => Promise<void>;
+  login: (googleToken: string, role: AuthRole) => Promise<User | null>;
+  setSession: (user: User, token: string, refreshToken?: string) => Promise<User>;
   logout: () => Promise<void>;
   updateUser: (data: Partial<User>) => Promise<void>;
   setError: (error: string | null) => void;
@@ -49,17 +66,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (storedToken && storedUser) {
           const parsedUser = JSON.parse(storedUser);
 
-          // -----------------------------------------
-          // 🔥 BACKEND (OPTIONAL BUT RECOMMENDED)
-          // Validate token:
-          // GET /auth/validate
-          // Authorization: Bearer token
-          //
-          // If invalid → clear storage
-          // -----------------------------------------
+          try {
+            // Validate persisted session with backend on app start.
+            const role =
+              parsedUser?.role === "technician" ? "technician" : "customer";
+            const validationResponse = await api.get("/auth/validate", {
+              params: { role },
+            });
 
-          setToken(storedToken);
-          setUser(parsedUser);
+            const validatedUser =
+              validationResponse?.data?.data?.user ||
+              validationResponse?.data?.user ||
+              parsedUser;
+
+            const normalizedUser = {
+              ...parsedUser,
+              ...validatedUser,
+              isProfileComplete: Boolean(
+                validatedUser?.isProfileComplete ?? parsedUser?.isProfileComplete
+              ),
+            };
+
+            setToken(storedToken);
+            setUser(normalizedUser);
+
+            await AsyncStorage.setItem(
+              STORAGE_KEYS.USER,
+              JSON.stringify(normalizedUser)
+            );
+          } catch (validationError) {
+            console.warn("Session validation failed:", validationError);
+
+            await AsyncStorage.multiRemove([
+              STORAGE_KEYS.TOKEN,
+              STORAGE_KEYS.REFRESH_TOKEN,
+              STORAGE_KEYS.USER,
+            ]);
+
+            setToken(null);
+            setUser(null);
+          }
         }
       } catch (err) {
         console.error("Restore session error:", err);
@@ -73,29 +119,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // 🔐 LOGIN
-  const login = async (userData: User, authToken: string) => {
+  const setSession = async (
+    userData: User,
+    authToken: string,
+    refreshToken?: string
+  ) => {
     try {
       setAuthLoading(true);
+      const normalizedUser = {
+        ...userData,
+        isProfileComplete: Boolean(userData.isProfileComplete),
+      };
 
-      // -----------------------------------------
-      // 🔥 BACKEND
-      // Called AFTER:
-      // POST /auth/login OR /auth/signup
-      //
-      // authToken = JWT token from backend
-      // -----------------------------------------
-
-      await AsyncStorage.multiSet([
+      const entries: [string, string][] = [
         [STORAGE_KEYS.TOKEN, authToken],
-        [STORAGE_KEYS.USER, JSON.stringify(userData)],
-      ]);
+        [STORAGE_KEYS.USER, JSON.stringify(normalizedUser)],
+      ];
 
-      setUser(userData);
+      if (refreshToken) {
+        entries.push([STORAGE_KEYS.REFRESH_TOKEN, refreshToken]);
+      }
+
+      await AsyncStorage.multiSet(entries);
+
+      setUser(normalizedUser);
       setToken(authToken);
       setError(null);
+
+      return normalizedUser;
     } catch (err) {
       console.error("Login error:", err);
       setError("Failed to save login session");
+      throw err;
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const login = async (googleToken: string, role: AuthRole) => {
+    try {
+      setAuthLoading(true);
+      setError(null);
+
+      const response = await loginWithGoogleToken(googleToken, role);
+      return await setSession(
+        response.user,
+        response.accessToken,
+        response.refreshToken
+      );
+    } catch (err) {
+      console.error("Google login error:", err);
+      setError("Failed to login with Google");
+      return null;
     } finally {
       setAuthLoading(false);
     }
@@ -114,6 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       await AsyncStorage.multiRemove([
         STORAGE_KEYS.TOKEN,
+        STORAGE_KEYS.REFRESH_TOKEN,
         STORAGE_KEYS.USER,
       ]);
 
@@ -186,6 +262,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         authLoading,
         error,
         login,
+  setSession,
         logout,
         updateUser,
         setError,

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -6,20 +6,20 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Welcome() {
   const router = useRouter();
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
   const redirectInProgress = useRef(false);
+  const [selectedRole, setSelectedRole] = useState<"customer" | "technician">("customer");
 
   // Only redirect when auth state is confirmed AND not loading
   useEffect(() => {
     if (!loading && isAuthenticated && !redirectInProgress.current) {
       redirectInProgress.current = true;
-      // Use replace to avoid history issues, and correct path with tabs grouping
-      router.replace('/(tabs)/home');
+      router.replace(user?.isProfileComplete ? '/(tabs)/home' : ('/complete-profile' as any));
     }
-  }, [isAuthenticated, loading]);
+  }, [isAuthenticated, loading, user, router]);
 
-  const handleHouseholdPress = () => {
-    router.push('/login');
+  const handleContinueWithGoogle = () => {
+    router.push(`/login?role=${selectedRole}` as any);
   };
 
   return (
@@ -40,20 +40,38 @@ export default function Welcome() {
               Your trusted platform for connecting with skilled professionals for all your home service needs.
             </Text>
 
-            {/* Action Buttons */}
+            {/* Role + Continue */}
             <View style={styles.actions}>
               <TouchableOpacity
-                style={styles.primaryBtn}
-                onPress={handleHouseholdPress}
+                style={[
+                  styles.secondaryBtn,
+                  selectedRole === 'customer' && styles.roleActive,
+                ]}
+                onPress={() => setSelectedRole('customer')}
               >
-                <Text style={styles.primaryBtnText}>I'm a Household</Text>
+                <Text style={[styles.secondaryBtnText, selectedRole === 'customer' && styles.roleActiveText]}>
+                  I&apos;m a Customer
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.secondaryBtn, styles.disabledBtn]}
-                disabled
+                style={[
+                  styles.secondaryBtn,
+                  selectedRole === 'technician' && styles.roleActive,
+                ]}
+                onPress={() => setSelectedRole('technician')}
               >
-                <Text style={styles.secondaryBtnText}>I'm a Service Provider</Text>
+                <Text style={[styles.secondaryBtnText, selectedRole === 'technician' && styles.roleActiveText]}>
+                  I&apos;m a Technician
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.primaryBtn}
+                onPress={handleContinueWithGoogle}
+              >
+                <MaterialIcons name="login" size={20} color="#ffffff" />
+                <Text style={styles.primaryBtnText}>Continue with Google</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -135,6 +153,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     fontFamily: 'Manrope',
+    marginLeft: 8,
   },
   secondaryBtn: {
     backgroundColor: '#ffffff',
@@ -156,7 +175,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Manrope',
   },
-  disabledBtn: {
-    opacity: 0.85,
+  roleActive: {
+    borderColor: '#3e2a56',
+    backgroundColor: '#f5eefe',
+  },
+  roleActiveText: {
+    color: '#3e2a56',
   },
 });

@@ -1,9 +1,9 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import { StyleSheet } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Header from "@/components/ui/Header";
-import { usePathname } from "expo-router";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 type IconName = React.ComponentProps<typeof MaterialIcons>["name"];
 
 export default function TabsLayout() {
@@ -31,63 +31,65 @@ const activeTab =
 const showBack =
   pathname.includes("/categories/") || pathname.includes("/services/");
   return (
-    <>
-      <Header title={tabTitles[activeTab] || "Home"} showBack={showBack} />
+    <ProtectedRoute requireProfileComplete>
+      <>
+        <Header title={tabTitles[activeTab] || "Home"} showBack={showBack} />
 
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: "#3e2a56",
-          tabBarInactiveTintColor: "#71717a",
-          tabBarStyle: styles.tabBar,
-          tabBarLabelStyle: styles.tabBarLabel,
-          tabBarLabelPosition: "below-icon",
-          headerShown: false,
-        }}
-      >
-        <Tabs.Screen
-          name="home"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ color }) => (
-              <TabBarIcon name="home" color={color} />
-            ),
+        <Tabs
+          screenOptions={{
+            tabBarActiveTintColor: "#3e2a56",
+            tabBarInactiveTintColor: "#71717a",
+            tabBarStyle: styles.tabBar,
+            tabBarLabelStyle: styles.tabBarLabel,
+            tabBarLabelPosition: "below-icon",
+            headerShown: false,
           }}
-        />
+        >
+          <Tabs.Screen
+            name="home"
+            options={{
+              title: "Home",
+              tabBarIcon: ({ color }) => (
+                <TabBarIcon name="home" color={color} />
+              ),
+            }}
+          />
 
-        <Tabs.Screen
-          name="services"
-          options={{
-            title: "Services",
-            tabBarIcon: ({ color }) => (
-              <TabBarIcon name="list-alt" color={color} />
-            ),
-          }}
-        />
+          <Tabs.Screen
+            name="services"
+            options={{
+              title: "Services",
+              tabBarIcon: ({ color }) => (
+                <TabBarIcon name="list-alt" color={color} />
+              ),
+            }}
+          />
 
-        <Tabs.Screen
-          name="bookings"
-          options={{
-            title: "Bookings",
-            tabBarIcon: ({ color }) => (
-              <TabBarIcon name="calendar-month" color={color} />
-            ),
-          }}
-        />
+          <Tabs.Screen
+            name="bookings"
+            options={{
+              title: "Bookings",
+              tabBarIcon: ({ color }) => (
+                <TabBarIcon name="calendar-month" color={color} />
+              ),
+            }}
+          />
 
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: "Profile",
-            tabBarIcon: ({ color }) => (
-              <TabBarIcon name="person" color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen name="categories/[id]" options={{ href: null }} />
-  <Tabs.Screen name="services/[id]" options={{ href: null }} />
-  <Tabs.Screen name="profile/edit" options={{ href: null }} />
-      </Tabs>
-    </>
+          <Tabs.Screen
+            name="profile"
+            options={{
+              title: "Profile",
+              tabBarIcon: ({ color }) => (
+                <TabBarIcon name="person" color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen name="categories/[id]" options={{ href: null }} />
+          <Tabs.Screen name="services/[id]" options={{ href: null }} />
+          <Tabs.Screen name="profile/edit" options={{ href: null }} />
+        </Tabs>
+      </>
+    </ProtectedRoute>
   );
 }
 

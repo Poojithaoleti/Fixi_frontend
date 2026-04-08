@@ -6,10 +6,34 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 
 function RootNavigation() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
+  useEffect(() => {
+    if (loading) return;
+
+    const first = String(segments[0] ?? "");
+    const inTabs = first === "(tabs)";
+    const inPublicRoute = first === "login" || first === "welcome" || first === "";
+    const inCompleteProfileRoute = first === "complete-profile";
+
+    if (!isAuthenticated && !inPublicRoute) {
+      router.replace("/login");
+      return;
+    }
+
+    if (isAuthenticated && user) {
+      if (!user.isProfileComplete && !inCompleteProfileRoute) {
+        router.replace("/complete-profile" as any);
+        return;
+      }
+
+      if (user.isProfileComplete && (inPublicRoute || inCompleteProfileRoute || !inTabs)) {
+        router.replace("/(tabs)/home");
+      }
+    }
+  }, [loading, isAuthenticated, user, segments, router]);
 
   return <Slot />;
 }

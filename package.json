@@ -10,11 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.5",
     "autoprefixer": "^10.4.27",
+    "axios": "^1.14.0",
+    "jwt-decode": "^4.0.0",
     "postcss": "^8.5.8",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.13.2",
+    "react-router-dom": "^7.14.0",
+    "socket.io-client": "^4.8.3",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
