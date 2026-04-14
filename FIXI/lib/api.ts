@@ -232,3 +232,128 @@ export const fetchAllServices = async (): Promise<Service[]> => {
     ];
   }, []);
 };
+
+// ============================================================
+// BOOKINGS (NEW)
+// ============================================================
+
+// Temporary in-memory storage (mock database)
+// Replace this with backend DB later
+let bookings: any[] = [];
+
+/**
+ * Create Booking
+ */
+export const createBooking = async (data: {
+  bookingId: string;
+  serviceName?: string;
+  price?: number;
+}) => {
+  return handleApiCall(async () => {
+    /**
+     * BACKEND INTEGRATION
+     * -------------------
+     * POST /booking
+     * Body:
+     * {
+     *   serviceId,
+     *   packageId,
+     *   userId
+     * }
+     */
+
+    const newBooking = {
+      id: data.bookingId,
+      serviceName: data.serviceName || "Service",
+      date: new Date().toLocaleString(),
+      price: data.price || 0,
+      status: "confirmed",
+    };
+
+    bookings.unshift(newBooking);
+
+    return newBooking;
+  }, null);
+};
+
+/**
+ * Fetch All Bookings
+ */
+export const fetchBookings = async () => {
+  return handleApiCall(async () => {
+    /**
+     * BACKEND INTEGRATION
+     * -------------------
+     * GET /bookings
+     * Headers:
+     * Authorization: Bearer <token>
+     */
+
+    return bookings;
+  }, []);
+};
+
+/**
+ * Fetch Single Booking
+ */
+export const fetchBookingDetails = async (id: string) => {
+  return handleApiCall(async () => {
+    /**
+     * BACKEND INTEGRATION
+     * -------------------
+     * GET /booking/:id
+     */
+
+    const booking = bookings.find((b) => b.id === id);
+
+    return booking || null;
+  }, null);
+};
+
+// ============================================================
+// PAYMENT (NEW)
+// ============================================================
+
+/**
+ * Initiate Payment
+ */
+export const initiatePayment = async (bookingId: string) => {
+  return handleApiCall(async () => {
+    /**
+     * BACKEND INTEGRATION
+     * -------------------
+     * POST /payment/initiate
+     * Body:
+     * {
+     *   bookingId
+     * }
+     */
+
+    return {
+      success: true,
+      paymentId: "mock_payment_id",
+    };
+  }, null);
+};
+
+/**
+ * Confirm Payment
+ */
+export const confirmPayment = async (bookingId: string) => {
+  return handleApiCall(async () => {
+    /**
+     * BACKEND INTEGRATION
+     * -------------------
+     * POST /payment/confirm
+     * Body:
+     * {
+     *   bookingId,
+     *   paymentMethod
+     * }
+     */
+
+    return {
+      success: true,
+    };
+  }, null);
+};

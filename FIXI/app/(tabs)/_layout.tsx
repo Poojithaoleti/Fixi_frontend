@@ -87,6 +87,9 @@ const showBack =
           <Tabs.Screen name="categories/[id]" options={{ href: null }} />
           <Tabs.Screen name="services/[id]" options={{ href: null }} />
           <Tabs.Screen name="profile/edit" options={{ href: null }} />
+          <Tabs.Screen name="bookings/[id]" options={{ href: null }} />
+          <Tabs.Screen name="payment/[id]" options={{ href: null }} />
+          <Tabs.Screen name="payment/success" options={{ href: null }} />
         </Tabs>
       </>
     </ProtectedRoute>

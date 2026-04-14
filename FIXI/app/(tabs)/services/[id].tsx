@@ -71,20 +71,29 @@ export default function ServiceDetailsScreen() {
     }
   };
 
-  const handleBookNow = () => {
-    if (!selectedPackage) {
-      Alert.alert("Error", "Please select a package");
-      return;
-    }
+ const handleBookNow = () => {
+  if (!selectedPackage) {
+    Alert.alert("Error", "Please select a package");
+    return;
+  }
 
-    // 🔥 BACKEND INTEGRATION
-    // POST /booking
+  // 🔥 BACKEND INTEGRATION
+  // POST /booking
+  // send:
+  // {
+  //   serviceId: service.id,
+  //   packageId: selectedPackage.id
+  // }
 
-    Alert.alert(
-      "Booking",
-      `Selected: ${selectedPackage.name}\nPrice: $${selectedPackage.price}`
-    );
-  };
+  // ✅ Navigate to booking details screen
+  router.push({
+    pathname: "/bookings/[id]",
+    params: {
+      id: service?.id || " ",
+      packageId: selectedPackage.id,
+    },
+  });
+};
 
   if (loading) {
     return (
